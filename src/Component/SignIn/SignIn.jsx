@@ -1,19 +1,15 @@
-import React from 'react'
-import GoogleButton from 'react-google-button'
-import {auth} from '../../firebase'
-import { GoogleAuthProvider , signInWithRedirect } from 'firebase/auth'
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const googleSignIn = ()=>{
-  const provider = new GoogleAuthProvider()
-  signInWithRedirect(auth,provider)
-}
 export default function SignIn() {
-
+  const navigate = useNavigate();
   return (
     <>
-    <div className='flex justify-center'>
-      <GoogleButton onClick={googleSignIn}/>
-    </div>
+      <div className="flex justify-center">
+        <button onClick={() => navigate("/login")} className="bg-gray-200 px-4 py-2 hover:bg-gray-100">
+          Login
+        </button>
+      </div>
     </>
-  )
+  );
 }

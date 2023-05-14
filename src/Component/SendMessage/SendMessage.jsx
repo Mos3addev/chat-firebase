@@ -1,20 +1,23 @@
 import React,{useState} from 'react'
-import {auth,db} from '../../firebase'
+import {db} from '../../firebase'
 import { addDoc,collection, serverTimestamp } from 'firebase/firestore'
+import { useAuthContext } from '../../context/AuthContext';
 
 
 export default function SendMessage({scroll}) {
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState('');
+  const { user } = useAuthContext();
   const sendMessage = async (e)=>{
     e.preventDefault()
     if(input === ''){
       alert('Please enter a valid message')
       return
     }
-    const {uid , displayName} = auth.currentUser
-    await addDoc(collection(db,'messages'),{
+
+    const { nameid: uid,  FirstName, LastName} = user;
+    await addDoc(collection(db, 'messages'), {
       text:input,
-      name : displayName,
+      name : `${FirstName} ${LastName}`,
       uid,
       timestamp: serverTimestamp()
     })

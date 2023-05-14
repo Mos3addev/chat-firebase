@@ -1,158 +1,267 @@
 /* eslint-disable array-callback-return */
-import React from 'react'
-import { useState,useEffect } from 'react'
-import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
-import Joi from 'joi';
-
+import React from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import Joi from "joi";
+import SignIn from "../SignIn/SignIn";
 
 export default function RegisterDoctor() {
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    window.scrollTo(0, 0);
+  }, []);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [errorList, setErrorList] = useState([]);
   const [user, setUser] = useState({
-    id: 'string',
-    firstName : '',
-    lastName : '',
-    emailAddress:'',
-    password:'',
-    dateOfBirth: '',
-    phoneNumber:'',
-    gender:true,
+    id: "string",
+    firstName: "",
+    lastName: "",
+    emailAddress: "",
+    password: "",
+    dateOfBirth: "",
+    phoneNumber: "",
+    gender: true,
     type: 0,
-    image:'string',
-    blood:0,
-    address:'',
-    confirmEmail:false
-  })
-  async function sendUserDataToApi(){
-    await axios.post(`https://localhost:7036/api/Users/Register`,user).then(response => {
-      setLoading(false);
-      navigate('/login');
-    })
-    .catch(error => {
-      setLoading(true);
-      setTimeout(() => {
+    image: "string",
+    blood: 0,
+    address: "",
+    confirmEmail: false,
+  });
+  async function sendUserDataToApi() {
+    await axios
+      .post(`https://localhost:7036/api/Users/Register`, user)
+      .then((response) => {
         setLoading(false);
-      }, 1000);
-      setError(error.response.message)
-      });;
+        navigate("/login");
+      })
+      .catch((error) => {
+        setLoading(true);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
+        setError(error.response.message);
+      });
   }
-  function getUserData(e)
-  {
-    let myUser={...user};
+  function getUserData(e) {
+    let myUser = { ...user };
     myUser[e.target.name] = e.target.value;
     setUser(myUser);
-    console.log(myUser)
-    
+    console.log(myUser);
   }
-  function submitRegisterForm(e){
+  function submitRegisterForm(e) {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 1000);
     let validation = validateRegisterForm();
-    if (validation.error){
+    if (validation.error) {
       console.log(validation.error.details);
       console.log("error");
 
-      setErrorList(validation.error.details)
-    }
-    else{
+      setErrorList(validation.error.details);
+    } else {
       sendUserDataToApi();
     }
   }
-  
-  function validateRegisterForm(){
-    const  scheme =  Joi.object({
+
+  function validateRegisterForm() {
+    const scheme = Joi.object({
       id: Joi.string(),
       firstName: Joi.string().min(3).max(15).required(),
       lastName: Joi.string().min(3).max(15).required(),
-      emailAddress: Joi.string().email({tlds:{allow:['com','net'] } }).required(),
+      emailAddress: Joi.string()
+        .email({ tlds: { allow: ["com", "net"] } })
+        .required(),
       password: Joi.string().pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{6,20}$/),
       dateOfBirth: Joi.string().required(),
-      phoneNumber: Joi.string().regex(/^01[0125][0-9]{8}$/).required(),
+      phoneNumber: Joi.string()
+        .regex(/^01[0125][0-9]{8}$/)
+        .required(),
       address: Joi.string().required(),
-      type : Joi.number().required(),
-      gender : Joi.boolean().required(),
+      type: Joi.number().required(),
+      gender: Joi.boolean().required(),
       image: Joi.string(),
-      blood : Joi.number().valid(0,1,2,3,4,5,6,7).required(),
-      confirmEmail : Joi.boolean().required(),
+      blood: Joi.number().valid(0, 1, 2, 3, 4, 5, 6, 7).required(),
+      confirmEmail: Joi.boolean().required(),
     });
-    return scheme.validate(user , {abortEarly:false});
- }
+    return scheme.validate(user, { abortEarly: false });
+  }
 
-
-
- return (
+  return (
     <>
-    <div className='w-75 mx-auto py-3'>
-      <div className='d-flex justify-content-between align-items-center'>
-        <h3 className='my-4 main-color'>Doctor Register</h3>
-        <Link to='/register/patient'><h5 className='secondary-color my-4'name='type' value='1'>Not A Doctor?</h5></Link>
-      </div>
-      {error?
-      <p className='text-danger'>
-        {error}
-      </p>:''}
-      
-      <form onSubmit={submitRegisterForm}>
-        <label htmlFor='firstName' className='main-color'>First name :</label>
-        <input onChange={getUserData} className="form-control my-input my-2" type="text" name='firstName' id='firstName'/>   
-        <p className='text-danger'>{errorList.filter((error)=>error.context.label === "firstName")[0]?.message}</p>
+      <div className="w-75 mx-auto py-3">
+        <div className="d-flex justify-content-between align-items-center">
+          <h3 className="my-4 main-color">Doctor Register</h3>
+          <Link to="/register/patient">
+            <h5 className="secondary-color my-4" name="type" value="1">
+              Not A Doctor?
+            </h5>
+          </Link>
+        </div>
+        {error ? <p className="text-danger">{error}</p> : ""}
 
-        <label htmlFor='lastName' className='main-color'>Last name :</label>
-        <input onChange={getUserData} className="form-control my-input my-2" type="text" name='lastName' id='lastName'/>   
-        <p className='text-danger'>{errorList.filter((error)=>error.context.label === "lastName")[0]?.message}</p>
+        <form onSubmit={submitRegisterForm}>
+          <label htmlFor="firstName" className="main-color">
+            First name :
+          </label>
+          <input
+            onChange={getUserData}
+            className="form-control my-input my-2"
+            type="text"
+            name="firstName"
+            id="firstName"
+          />
+          <p className="text-danger">{errorList.filter((error) => error.context.label === "firstName")[0]?.message}</p>
 
-        <label htmlFor='emailAddress' className='main-color'>Email :</label>
-        <input onChange={getUserData} className="form-control my-input my-2" type="email" name='emailAddress' id='emailAddress'/>
-        <p className='text-danger'>{errorList.filter((error)=>error.context.label ==="emailAddress")[0]?.message}</p>
+          <label htmlFor="lastName" className="main-color">
+            Last name :
+          </label>
+          <input
+            onChange={getUserData}
+            className="form-control my-input my-2"
+            type="text"
+            name="lastName"
+            id="lastName"
+          />
+          <p className="text-danger">{errorList.filter((error) => error.context.label === "lastName")[0]?.message}</p>
 
-        <label htmlFor='password' className='main-color'>Password :</label>
-        <input onChange={getUserData} className="form-control my-input my-2" type="Password" name='password' id='password'/>   
-        {errorList.map((error,index)=>{
-									if(error.context.label === 'password'){
-									return <p key={index} className='text-danger'>Password not matches between 6 and 20 and must content at least uppercase letter, lowercase letter, and digit number.</p>
-									}})}
+          <label htmlFor="emailAddress" className="main-color">
+            Email :
+          </label>
+          <input
+            onChange={getUserData}
+            className="form-control my-input my-2"
+            type="email"
+            name="emailAddress"
+            id="emailAddress"
+          />
+          <p className="text-danger">
+            {errorList.filter((error) => error.context.label === "emailAddress")[0]?.message}
+          </p>
 
-        <label className='main-color'>Gender:</label>
-        <br />  
-        <input className='my-2' type="radio" name="gender" value={true} checked={user.gender === true} id='male' onChange={getUserData} />
-        <label htmlFor='male' className='main-color'>Male </label>
-        <br />
-        <input type="radio" name="gender" value={false} checked={user.gender === 'false'} id='female' onChange={getUserData} />
-        <label htmlFor='female' className='main-color'>Female </label>
+          {/* <label htmlFor="password" className="main-color">
+            Password :
+          </label>
+          <input
+            onChange={getUserData}
+            className="form-control my-input my-2"
+            type="Password"
+            name="password"
+            id="password"
+          />
+          {errorList.map((error, index) => {
+            if (error.context.label === "password") {
+              return (
+                <p key={index} className="text-danger">
+                  Password not matches between 6 and 20 and must content at least uppercase letter, lowercase letter,
+                  and digit number.
+                </p>
+              );
+            }
+          })} */}
 
-        <br /><br />
-        <label htmlFor='phoneNumber' className='main-color'>Phone :</label>
-        <input onChange={getUserData} className="form-control my-input my-2" type="Number" name='phoneNumber' id='phoneNumber' required/>  
-        <p className='text-danger'>{errorList.filter((error)=>error.context.label === "phoneNumber")[0]?.message}</p>
-        
+          <label className="main-color">Gender:</label>
+          <br />
+          <input
+            className="my-2"
+            type="radio"
+            name="gender"
+            value={true}
+            checked={user.gender === true}
+            id="male"
+            onChange={getUserData}
+          />
+          <label htmlFor="male" className="main-color">
+            Male{" "}
+          </label>
+          <br />
+          <input
+            type="radio"
+            name="gender"
+            value={false}
+            checked={user.gender === "false"}
+            id="female"
+            onChange={getUserData}
+          />
+          <label htmlFor="female" className="main-color">
+            Female{" "}
+          </label>
 
-        <label htmlFor='address' className='main-color'>Address :</label>
-        <input onChange={getUserData} className="form-control my-input my-2" type="text" name='address' id='address' required/>  
-        <p className='text-danger'>{errorList.filter((error)=>error.context.label === "address")[0]?.message}</p>
+          <br />
+          <br />
+          <label htmlFor="phoneNumber" className="main-color">
+            Phone :
+          </label>
+          <input
+            onChange={getUserData}
+            className="form-control my-input my-2"
+            type="Number"
+            name="phoneNumber"
+            id="phoneNumber"
+            required
+          />
+          <p className="text-danger">
+            {errorList.filter((error) => error.context.label === "phoneNumber")[0]?.message}
+          </p>
 
-        <label htmlFor='dateOfBirth' className='main-color'>Date of Birth:</label>
-        <input onChange={getUserData} className="form-control main-color w-25 my-input my-2" type="date" name="dateOfBirth" value={user.dateOfBirth} id='dateOfBirth' required/>
-        <p className='text-danger'>{errorList.filter((error)=>error.context.label === "dateOfBirth")[0]?.message}</p>
+          <label htmlFor="address" className="main-color">
+            Address :
+          </label>
+          <input
+            onChange={getUserData}
+            className="form-control my-input my-2"
+            type="text"
+            name="address"
+            id="address"
+            required
+          />
+          <p className="text-danger">{errorList.filter((error) => error.context.label === "address")[0]?.message}</p>
 
+          <label htmlFor="dateOfBirth" className="main-color">
+            Date of Birth:
+          </label>
+          <input
+            onChange={getUserData}
+            className="form-control main-color w-25 my-input my-2"
+            type="date"
+            name="dateOfBirth"
+            value={user.dateOfBirth}
+            id="dateOfBirth"
+            required
+          />
+          <p className="text-danger">
+            {errorList.filter((error) => error.context.label === "dateOfBirth")[0]?.message}
+          </p>
 
-      
-        
-      <button type='submit' className='w-100 mt-3 btn btn-outline-success'>
+          {/* <button type='submit' className='w-100 mt-3 btn btn-outline-success'>
         {loading ? <i className='fas fa-spinner fa-spin'></i>:'Register'}
-      </button>
+      </button> */}
 
-        
-      </form>
-    </div>
+          <div style={{ width: "max-content", margin: "auto", marginBottom: 80, position: "relative", opacity: errorList.length == 0 ? 1 : 0.4 }} onClick={(e) => {
+            submitRegisterForm();
+          }}>
+            <div
+              style={{
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                display: errorList.length == 0 ? "none" : "block",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0,0,0,0.5)",
+                zIndex: 2,
+                cursor: "pointer",
+              }}
+            ></div>
+            <SignIn label="Register with Google" />
+          </div>
+        </form>
+      </div>
     </>
-  )
+  );
 }
